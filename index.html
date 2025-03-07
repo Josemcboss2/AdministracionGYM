@@ -168,10 +168,29 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="chart-row">
+                <div class="chart-col">
+                    <div class="chart-container">
+                        <h3>Distribución de membresías</h3>
+                        <canvas id="membershipChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-col">
+                    <div class="chart-container">
+                        <h3>Asistencia por hora</h3>
+                        <canvas id="hourlyAttendanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Clientes Section -->
         <div id="clients" class="section-content">
+            <div class="search-container">
+                <input type="text" id="clientSearch" placeholder="Buscar cliente..." onkeyup="searchClients()">
+            </div>
+            
             <div class="table-container">
                 <div class="table-header">
                     <h3>Lista de Clientes</h3>
@@ -286,6 +305,45 @@
                     </tbody>
                 </table>
             </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Clientes por vencer</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Membresía</th>
+                            <th>Fecha inicio</th>
+                            <th>Fecha fin</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Laura Sánchez</td>
+                            <td>Básico</td>
+                            <td>20/02/2023</td>
+                            <td>20/03/2023</td>
+                            <td>
+                                <button class="btn btn-primary action-btn" onclick="openModal('renewMembershipModal')">Renovar</button>
+                                <button class="btn btn-secondary action-btn" onclick="sendReminderEmail(5)">Enviar recordatorio</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Pedro Ramírez</td>
+                            <td>Estándar</td>
+                            <td>05/01/2023</td>
+                            <td>05/04/2023</td>
+                            <td>
+                                <button class="btn btn-primary action-btn" onclick="openModal('renewMembershipModal')">Renovar</button>
+                                <button class="btn btn-secondary action-btn" onclick="sendReminderEmail(6)">Enviar recordatorio</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Asistencia Section -->
@@ -336,7 +394,6 @@
                 </table>
             </div>
         </div>
-
         <!-- Pagos Section -->
         <div id="payments" class="section-content">
             <div class="form-container">
@@ -370,12 +427,443 @@
                         <label for="paymentMethod">Método de pago</label>
                         <select id="paymentMethod">
                             <option value="">Seleccionar método</option>
-                            </div>
                             <option value="cash">Efectivo</option>
                             <option value="card">Tarjeta de crédito</option>
                             <option value="transfer">Transferencia</option>
                         </select>
                     </div>
                 </div>
-                <button class="btn btn-primary" onclick="showAlert('success', 'Pago registrado correctamente')">Registrar Pago</button>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="paymentDiscount">Descuento (%)</label>
+                        <input type="number" id="paymentDiscount" min="0" max="100" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="paymentStatus">Estado del pago</label>
+                        <select id="paymentStatus">
+                            <option value="paid">Pagado</option>
+                            <option value="pending">Pendiente</option>
+                            <option value="refunded">Reembolsado</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="registerPayment()">Registrar Pago</button>
             </div>
+            
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Historial de Pagos</h3>
+                    <div class="filter-container">
+                        <label for="paymentFilter">Filtrar por:</label>
+                        <select id="paymentFilter" onchange="filterPayments()">
+                            <option value="all">Todos</option>
+                            <option value="paid">Pagados</option>
+                            <option value="pending">Pendientes</option>
+                            <option value="refunded">Reembolsados</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Transacción</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Membresía</th>
+                            <th>Monto</th>
+                            <th>Descuento</th>
+                            <th>Total</th>
+                            <th>Método</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>P-2023-001</td>
+                            <td>01/03/2023</td>
+                            <td>Ana Martínez</td>
+                            <td>Premium</td>
+                            <td>$300.00</td>
+                            <td>10%</td>
+                            <td>$270.00</td>
+                            <td>Tarjeta</td>
+                            <td><span class="status active">Pagado</span></td>
+                            <td>
+                                <button class="btn btn-primary action-btn" onclick="generateReceipt('P-2023-001')">Recibo</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>P-2023-002</td>
+                            <td>15/02/2023</td>
+                            <td>Carlos Rodríguez</td>
+                            <td>Básico</td>
+                            <td>$30.00</td>
+                            <td>0%</td>
+                            <td>$30.00</td>
+                            <td>Efectivo</td>
+                            <td><span class="status active">Pagado</span></td>
+                            <td>
+                                <button class="btn btn-primary action-btn" onclick="generateReceipt('P-2023-002')">Recibo</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>P-2023-003</td>
+                            <td>10/03/2023</td>
+                            <td>María López</td>
+                            <td>Estándar</td>
+                            <td>$80.00</td>
+                            <td>5%</td>
+                            <td>$76.00</td>
+                            <td>Transferencia</td>
+                            <td><span class="status pending">Pendiente</span></td>
+                            <td>
+                                <button class="btn btn-primary action-btn" onclick="updatePaymentStatus('P-2023-003')">Actualizar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+<!-- Entrenadores Section -->
+<div id="trainers" class="section-content">
+    <div class="table-container">
+        <div class="table-header">
+            <h3>Lista de Entrenadores</h3>
+            <button class="btn btn-primary" onclick="openModal('addTrainerModal')">Nuevo Entrenador</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Especialidad</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Horario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Roberto Méndez</td>
+                    <td>Musculación</td>
+                    <td>roberto@example.com</td>
+                    <td>555-2468</td>
+                    <td>Lun-Vie: 8am-2pm</td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="editTrainer(1)">Editar</button>
+                        <button class="btn btn-danger action-btn" onclick="deleteTrainer(1)">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Patricia Vásquez</td>
+                    <td>Cardio</td>
+                    <td>patricia@example.com</td>
+                    <td>555-1357</td>
+                    <td>Lun-Vie: 3pm-9pm</td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="editTrainer(2)">Editar</button>
+                        <button class="btn btn-danger action-btn" onclick="deleteTrainer(2)">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Diego Alonso</td>
+                    <td>CrossFit</td>
+                    <td>diego@example.com</td>
+                    <td>555-3690</td>
+                    <td>Sáb-Dom: 10am-6pm</td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="editTrainer(3)">Editar</button>
+                        <button class="btn btn-danger action-btn" onclick="deleteTrainer(3)">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Reportes Section -->
+<div id="reports" class="section-content">
+    <div class="form-container">
+        <h3 class="form-title">Generación de Reportes</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="reportType">Tipo de Reporte</label>
+                <select id="reportType">
+                    <option value="">Seleccionar tipo</option>
+                    <option value="ingresos">Ingresos</option>
+                    <option value="asistencias">Asistencias</option>
+                    <option value="clientes">Clientes</option>
+                    <option value="membresias">Membresías</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="reportPeriod">Periodo</label>
+                <select id="reportPeriod">
+                    <option value="">Seleccionar periodo</option>
+                    <option value="dia">Diario</option>
+                    <option value="semana">Semanal</option>
+                    <option value="mes">Mensual</option>
+                    <option value="anio">Anual</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="reportStartDate">Fecha Inicio</label>
+                <input type="date" id="reportStartDate">
+            </div>
+            <div class="form-group">
+                <label for="reportEndDate">Fecha Fin</label>
+                <input type="date" id="reportEndDate">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="reportFormat">Formato</label>
+                <select id="reportFormat">
+                    <option value="pdf">PDF</option>
+                    <option value="excel">Excel</option>
+                    <option value="csv">CSV</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="generateReport(document.getElementById('reportType').value)">Generar Reporte</button>
+    </div>
+    
+    <div class="table-container">
+        <div class="table-header">
+            <h3>Reportes Recientes</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Periodo</th>
+                    <th>Fecha Generación</th>
+                    <th>Generado por</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Ingresos</td>
+                    <td>Mensual - Feb 2023</td>
+                    <td>01/03/2023</td>
+                    <td>Administrador</td>
+                    <td>
+                        <button class="btn btn-primary action-btn">Ver</button>
+                        <button class="btn btn-secondary action-btn">Descargar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Asistencias</td>
+                    <td>Semanal - 20/02 al 26/02</td>
+                    <td>27/02/2023</td>
+                    <td>Administrador</td>
+                    <td>
+                        <button class="btn btn-primary action-btn">Ver</button>
+                        <button class="btn btn-secondary action-btn">Descargar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Clientes</td>
+                    <td>Anual - 2022</td>
+                    <td>15/01/2023</td>
+                    <td>Administrador</td>
+                    <td>
+                        <button class="btn btn-primary action-btn">Ver</button>
+                        <button class="btn btn-secondary action-btn">Descargar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Configuración Section -->
+<div id="settings" class="section-content">
+    <div class="tabs">
+        <div class="tab active" data-tab="general">General</div>
+        <div class="tab" data-tab="users">Usuarios</div>
+        <div class="tab" data-tab="backup">Respaldos</div>
+    </div>
+    
+    <div id="general" class="tab-content active">
+        <div class="form-container">
+            <h3 class="form-title">Configuración General</h3>
+            <div class="form-group">
+                <label for="gymName">Nombre del Gimnasio</label>
+                <input type="text" id="gymName" value="GymSystem">
+            </div>
+            <div class="form-group">
+                <label for="gymAddress">Dirección</label>
+                <input type="text" id="gymAddress" value="Calle Principal #123">
+            </div>
+            <div class="form-group">
+                <label for="gymPhone">Teléfono</label>
+                <input type="text" id="gymPhone" value="555-123-4567">
+            </div>
+            <div class="form-group">
+                <label for="gymEmail">Email</label>
+                <input type="email" id="gymEmail" value="info@gymsystem.com">
+            </div>
+            <div class="form-group">
+                <label for="currency">Moneda</label>
+                <select id="currency">
+                    <option value="USD" selected>USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="MXN">MXN ($)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="timezone">Zona Horaria</label>
+                <select id="timezone">
+                    <option value="UTC-5" selected>UTC-5 (EST)</option>
+                    <option value="UTC-6">UTC-6 (CST)</option>
+                    <option value="UTC-7">UTC-7 (MST)</option>
+                    <option value="UTC-8">UTC-8 (PST)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings('general')">Guardar Cambios</button>
+        </div>
+    </div>
+    
+    <div id="users" class="tab-content">
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Usuarios del Sistema</h3>
+                <button class="btn btn-primary" onclick="openModal('addUserModal')">Nuevo Usuario</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Admin Principal</td>
+                        <td>admin@gymsystem.com</td>
+                        <td>Administrador</td>
+                        <td><span class="status active">Activo</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn">Editar</button>
+                            <button class="btn btn-danger action-btn">Desactivar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Recepcionista</td>
+                        <td>recepcion@gymsystem.com</td>
+                        <td>Recepcionista</td>
+                        <td><span class="status active">Activo</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn">Editar</button>
+                            <button class="btn btn-danger action-btn">Desactivar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Entrenador</td>
+                        <td>entrenador@gymsystem.com</td>
+                        <td>Entrenador</td>
+                        <td><span class="status inactive">Inactivo</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn">Editar</button>
+                            <button class="btn btn-secondary action-btn">Activar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="backup" class="tab-content">
+        <div class="form-container">
+            <h3 class="form-title">Respaldo y Restauración</h3>
+            <div class="form-group">
+                <label>Último respaldo</label>
+                <p>Fecha: 01/03/2023 05:00 AM</p>
+                <p>Tamaño: 25.4 MB</p>
+            </div>
+            <div class="form-group">
+                <label for="backupFrequency">Frecuencia de respaldo automático</label>
+                <select id="backupFrequency">
+                    <option value="daily">Diario</option>
+                    <option value="weekly" selected>Semanal</option>
+                    <option value="monthly">Mensual</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="createBackup()">Crear Respaldo Ahora</button>
+            <button class="btn btn-secondary" onclick="openModal('restoreBackupModal')">Restaurar desde Archivo</button>
+        </div>
+        
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Historial de Respaldos</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tamaño</th>
+                        <th>Creado por</th>
+                        <th>Tipo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>01/03/2023 05:00 AM</td>
+                        <td>25.4 MB</td>
+                        <td>Sistema (Automático)</td>
+                        <td>Completo</td>
+                        <td>
+                            <button class="btn btn-secondary action-btn">Descargar</button>
+                            <button class="btn btn-primary action-btn">Restaurar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>22/02/2023 05:00 AM</td>
+                        <td>24.8 MB</td>
+                        <td>Sistema (Automático)</td>
+                        <td>Completo</td>
+                        <td>
+                            <button class="btn btn-secondary action-btn">Descargar</button>
+                            <button class="btn btn-primary action-btn">Restaurar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>15/02/2023 10:15 AM</td>
+                        <td>24.5 MB</td>
+                        <td>Admin Principal</td>
+                        <td>Manual</td>
+                        <td>
+                            <button class="btn btn-secondary action-btn">Descargar</button>
+                            <button class="btn btn-primary action-btn">Restaurar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modales -->
+<!-- Modal Agregar Cliente -->
+<div id="addClientModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Agregar Nuevo Cliente</h3>
