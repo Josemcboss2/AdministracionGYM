@@ -1,0 +1,130 @@
+<div id="payments" class="section-content">
+    <div class="form-container">
+        <h3 class="form-title">Registrar Pago</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="paymentClientId">Cliente</label>
+                <select id="paymentClientId">
+                    <option value="">Seleccionar cliente</option>
+                    <option value="1">Ana Martínez</option>
+                    <option value="2">Carlos Rodríguez</option>
+                    <option value="3">María López</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="paymentMembership">Membresía</label>
+                <select id="paymentMembership">
+                    <option value="">Seleccionar membresía</option>
+                    <option value="1">Básico - $30</option>
+                    <option value="2">Estándar - $80</option>
+                    <option value="3">Premium - $300</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="paymentAmount">Monto</label>
+                <input type="number" id="paymentAmount" placeholder="0.00">
+            </div>
+            <div class="form-group">
+                <label for="paymentMethod">Método de pago</label>
+                <select id="paymentMethod">
+                    <option value="">Seleccionar método</option>
+                    <option value="cash">Efectivo</option>
+                    <option value="card">Tarjeta de crédito</option>
+                    <option value="transfer">Transferencia</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="paymentDiscount">Descuento (%)</label>
+                <input type="number" id="paymentDiscount" min="0" max="100" placeholder="0">
+            </div>
+            <div class="form-group">
+                <label for="paymentStatus">Estado del pago</label>
+                <select id="paymentStatus">
+                    <option value="paid">Pagado</option>
+                    <option value="pending">Pendiente</option>
+                    <option value="refunded">Reembolsado</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="registerPayment()">Registrar Pago</button>
+    </div>
+    
+    <div class="table-container">
+        <div class="table-header">
+            <h3>Historial de Pagos</h3>
+            <div class="filter-container">
+                <label for="paymentFilter">Filtrar por:</label>
+                <select id="paymentFilter" onchange="filterPayments()">
+                    <option value="all">Todos</option>
+                    <option value="paid">Pagados</option>
+                    <option value="pending">Pendientes</option>
+                    <option value="refunded">Reembolsados</option>
+                </select>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Transacción</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Membresía</th>
+                    <th>Monto</th>
+                    <th>Descuento</th>
+                    <th>Total</th>
+                    <th>Método</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>P-2023-001</td>
+                    <td>01/03/2023</td>
+                    <td>Ana Martínez</td>
+                    <td>Premium</td>
+                    <td>$300.00</td>
+                    <td>10%</td>
+                    <td>$270.00</td>
+                    <td>Tarjeta</td>
+                    <td><span class="status active">Pagado</span></td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="generateReceipt('P-2023-001')">Recibo</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>P-2023-002</td>
+                    <td>15/02/2023</td>
+                    <td>Carlos Rodríguez</td>
+                    <td>Básico</td>
+                    <td>$30.00</td>
+                    <td>0%</td>
+                    <td>$30.00</td>
+                    <td>Efectivo</td>
+                    <td><span class="status active">Pagado</span></td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="generateReceipt('P-2023-002')">Recibo</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>P-2023-003</td>
+                    <td>10/03/2023</td>
+                    <td>María López</td>
+                    <td>Estándar</td>
+                    <td>$80.00</td>
+                    <td>5%</td>
+                    <td>$76.00</td>
+                    <td>Transferencia</td>
+                    <td><span class="status pending">Pendiente</span></td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="updatePaymentStatus('P-2023-003')">Actualizar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

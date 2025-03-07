@@ -1,0 +1,173 @@
+<div id="settings" class="section-content">
+    <div class="tabs">
+        <div class="tab active" data-tab="general">General</div>
+        <div class="tab" data-tab="users">Usuarios</div>
+        <div class="tab" data-tab="backup">Respaldos</div>
+    </div>
+    
+    <div id="general" class="tab-content active">
+        <div class="form-container">
+            <h3 class="form-title">Configuración General</h3>
+            <div class="form-group">
+                <label for="gymName">Nombre del Gimnasio</label>
+                <input type="text" id="gymName" value="GymSystem">
+            </div>
+            <div class="form-group">
+                <label for="gymAddress">Dirección</label>
+                <input type="text" id="gymAddress" value="Calle Principal #123">
+            </div>
+            <div class="form-group">
+                <label for="gymPhone">Teléfono</label>
+                <input type="text" id="gymPhone" value="555-123-4567">
+            </div>
+            <div class="form-group">
+                <label for="gymEmail">Email</label>
+                <input type="email" id="gymEmail" value="info@gymsystem.com">
+            </div>
+            <div class="form-group">
+                <label for="currency">Moneda</label>
+                <select id="currency">
+                    <option value="USD" selected>USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="MXN">MXN ($)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="timezone">Zona Horaria</label>
+                <select id="timezone">
+                    <option value="UTC-5" selected>UTC-5 (EST)</option>
+                    <option value="UTC-6">UTC-6 (CST)</option>
+                    <option value="UTC-7">UTC-7 (MST)</option>
+                    <option value="UTC-8">UTC-8 (PST)</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings('general')">Guardar Cambios</button>
+        </div>
+    </div>
+    
+    <div id="users" class="tab-content">
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Usuarios del Sistema</h3>
+                <button class="btn btn-primary" onclick="openModal('addUserModal')">Nuevo Usuario</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Admin Principal</td>
+                        <td>admin@gymsystem.com</td>
+                        <td>Administrador</td>
+                        <td><span class="status active">Activo</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn">Editar</button>
+                            <button class="btn btn-danger action-btn">Desactivar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Recepcionista</td>
+                        <td>recepcion@gymsystem.com</td>
+                        <td>Recepcionista</td>
+                        <td><span class="status active">Activo</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn">Editar</button>
+                            <button class="btn btn-danger action-btn">Desactivar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Entrenador</td>
+                        <td>entrenador@gymsystem.com</td>
+                        <td>Entrenador</td>
+                        <td><span class="status inactive">Inactivo</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn">Editar</button>
+                            <button class="btn btn-secondary action-btn">Activar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="backup" class="tab-content">
+        <div class="form-container">
+            <h3 class="form-title">Respaldo y Restauración</h3>
+            <div class="form-group">
+                <label>Último respaldo</label>
+                <p>Fecha: 01/03/2023 05:00 AM</p>
+                <p>Tamaño: 25.4 MB</p>
+            </div>
+            <div class="form-group">
+                <label for="backupFrequency">Frecuencia de respaldo automático</label>
+                <select id="backupFrequency">
+                    <option value="daily">Diario</option>
+                    <option value="weekly" selected>Semanal</option>
+                    <option value="monthly">Mensual</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="createBackup()">Crear Respaldo Ahora</button>
+            <button class="btn btn-secondary" onclick="openModal('restoreBackupModal')">Restaurar desde Archivo</button>
+        </div>
+        
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Historial de Respaldos</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tamaño</th>
+                        <th>Creado por</th>
+                        <th>Tipo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>01/03/2023 05:00 AM</td>
+                        <td>25.4 MB</td>
+                        <td>Sistema (Automático)</td>
+                        <td>Completo</td>
+                        <td>
+                            <button class="btn btn-secondary action-btn">Descargar</button>
+                            <button class="btn btn-primary action-btn">Restaurar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>22/02/2023 05:00 AM</td>
+                        <td>24.8 MB</td>
+                        <td>Sistema (Automático)</td>
+                        <td>Completo</td>
+                        <td>
+                            <button class="btn btn-secondary action-btn">Descargar</button>
+                            <button class="btn btn-primary action-btn">Restaurar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>15/02/2023 10:15 AM</td>
+                        <td>24.5 MB</td>
+                        <td>Admin Principal</td>
+                        <td>Manual</td>
+                        <td>
+                            <button class="btn btn-secondary action-btn">Descargar</button>
+                            <button class="btn btn-primary action-btn">Restaurar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

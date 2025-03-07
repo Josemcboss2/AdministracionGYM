@@ -1,0 +1,60 @@
+<div id="editMembershipModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Editar Membresía</h3>
+            <span class="modal-close" onclick="closeModal('editMembershipModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="editMembershipForm" onsubmit="submitMembershipForm(event, 'editMembershipForm')">
+                <input type="hidden" id="editMembershipId" name="editMembershipId">
+                <div class="form-group">
+                    <label for="editMembershipName">Nombre *</label>
+                    <input type="text" id="editMembershipName" name="editMembershipName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editMembershipDescription">Descripción *</label>
+                    <textarea id="editMembershipDescription" name="editMembershipDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editMembershipDuration">Duración (meses) *</label>
+                        <input type="number" id="editMembershipDuration" name="editMembershipDuration" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editMembershipPrice">Precio *</label>
+                        <input type="number" id="editMembershipPrice" name="editMembershipPrice" min="0" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Accesos incluidos</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editAccessGym" name="access" value="gym" checked>
+                            <label for="editAccessGym">Acceso a equipos</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editAccessClasses" name="access" value="classes">
+                            <label for="editAccessClasses">Clases grupales</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editAccessPool" name="access" value="pool">
+                            <label for="editAccessPool">Piscina</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="editAccessSauna" name="access" value="sauna">
+                            <label for="editAccessSauna">Sauna</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editMembershipTrainingSession">Sesiones con entrenador personal</label>
+                    <input type="number" id="editMembershipTrainingSession" name="editMembershipTrainingSession" min="0" value="0">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('editMembershipModal')">Cancelar</button>
+            <button class="btn btn-primary" onclick="document.getElementById('editMembershipForm').requestSubmit()">Guardar cambios</button>
+        </div>
+    </div>
+</div>

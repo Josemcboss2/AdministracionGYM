@@ -1,0 +1,59 @@
+<div id="trainers" class="section-content">
+    <div class="table-container">
+        <div class="table-header">
+            <h3>Lista de Entrenadores</h3>
+            <button class="btn btn-primary" onclick="openModal('addTrainerModal')">Nuevo Entrenador</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Especialidad</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Horario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Roberto Méndez</td>
+                    <td>Musculación</td>
+                    <td>roberto@example.com</td>
+                    <td>555-2468</td>
+                    <td>Lun-Vie: 8am-2pm</td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="editTrainer(1)">Editar</button>
+                        <button class="btn btn-danger action-btn" onclick="deleteTrainer(1)">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Patricia Vásquez</td>
+                    <td>Cardio</td>
+                    <td>patricia@example.com</td>
+                    <td>555-1357</td>
+                    <td>Lun-Vie: 3pm-9pm</td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="editTrainer(2)">Editar</button>
+                        <button class="btn btn-danger action-btn" onclick="deleteTrainer(2)">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Diego Alonso</td>
+                    <td>CrossFit</td>
+                    <td>diego@example.com</td>
+                    <td>555-3690</td>
+                    <td>Sáb-Dom: 10am-6pm</td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="editTrainer(3)">Editar</button>
+                        <button class="btn btn-danger action-btn" onclick="deleteTrainer(3)">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

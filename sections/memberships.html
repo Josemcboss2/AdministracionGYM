@@ -1,0 +1,94 @@
+<div id="memberships" class="section-content">
+    <div class="table-container">
+        <div class="table-header">
+            <h3>Planes de Membresía</h3>
+            <button class="btn btn-primary" onclick="openModal('addMembershipModal')">Nueva Membresía</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Duración</th>
+                    <th>Precio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Básico</td>
+                    <td>Acceso a equipos básicos y clases grupales</td>
+                    <td>1 mes</td>
+                    <td>$30</td>
+                    <td>
+                        <button class="btn btn-primary action-btn">Editar</button>
+                        <button class="btn btn-danger action-btn">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Estándar</td>
+                    <td>Acceso a todas las áreas y clases grupales</td>
+                    <td>3 meses</td>
+                    <td>$80</td>
+                    <td>
+                        <button class="btn btn-primary action-btn">Editar</button>
+                        <button class="btn btn-danger action-btn">Eliminar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Premium</td>
+                    <td>Acceso completo + 2 sesiones con entrenador personal</td>
+                    <td>12 meses</td>
+                    <td>$300</td>
+                    <td>
+                        <button class="btn btn-primary action-btn">Editar</button>
+                        <button class="btn btn-danger action-btn">Eliminar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <h3>Clientes por vencer</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Membresía</th>
+                    <th>Fecha inicio</th>
+                    <th>Fecha fin</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Laura Sánchez</td>
+                    <td>Básico</td>
+                    <td>20/02/2023</td>
+                    <td>20/03/2023</td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="openModal('renewMembershipModal')">Renovar</button>
+                        <button class="btn btn-secondary action-btn" onclick="sendReminderEmail(5)">Enviar recordatorio</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Pedro Ramírez</td>
+                    <td>Estándar</td>
+                    <td>05/01/2023</td>
+                    <td>05/04/2023</td>
+                    <td>
+                        <button class="btn btn-primary action-btn" onclick="openModal('renewMembershipModal')">Renovar</button>
+                        <button class="btn btn-secondary action-btn" onclick="sendReminderEmail(6)">Enviar recordatorio</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

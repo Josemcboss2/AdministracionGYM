@@ -1,0 +1,94 @@
+<div id="reports" class="section-content">
+    <div class="form-container">
+        <h3 class="form-title">Generación de Reportes</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="reportType">Tipo de Reporte</label>
+                <select id="reportType">
+                    <option value="">Seleccionar tipo</option>
+                    <option value="ingresos">Ingresos</option>
+                    <option value="asistencias">Asistencias</option>
+                    <option value="clientes">Clientes</option>
+                    <option value="membresias">Membresías</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="reportPeriod">Periodo</label>
+                <select id="reportPeriod">
+                    <option value="">Seleccionar periodo</option>
+                    <option value="dia">Diario</option>
+                    <option value="semana">Semanal</option>
+                    <option value="mes">Mensual</option>
+                    <option value="anio">Anual</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="reportStartDate">Fecha Inicio</label>
+                <input type="date" id="reportStartDate">
+            </div>
+            <div class="form-group">
+                <label for="reportEndDate">Fecha Fin</label>
+                <input type="date" id="reportEndDate">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="reportFormat">Formato</label>
+                <select id="reportFormat">
+                    <option value="pdf">PDF</option>
+                    <option value="excel">Excel</option>
+                    <option value="csv">CSV</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="generateReport(document.getElementById('reportType').value)">Generar Reporte</button>
+    </div>
+    
+    <div class="table-container">
+        <div class="table-header">
+            <h3>Reportes Recientes</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Periodo</th>
+                    <th>Fecha Generación</th>
+                    <th>Generado por</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Ingresos</td>
+                    <td>Mensual - Feb 2023</td>
+                    <td>01/03/2023</td>
+                    <td>Administrador</td>
+                    <td>
+                        <button class="btn btn-primary action-btn">Ver</button>
+                        <button class="btn btn-secondary action-btn">Descargar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Asistencias</td>
+                    <td>Semanal - 20/02 al 26/02</td>
+                    <td>27/02/2023</td>
+                    <td>Administrador</td>
+                    <td>
+                        <button class="btn btn-primary action-btn">Ver</button>
+                        <button class="btn btn-secondary action-btn">Descargar</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Clientes</td>
+                    <td>Anual - 2022</td>
+                    <td>15/01/2023</td>
+                    <td>Administrador</td>
+                    <td>
+                        <button class="btn btn-primary action-btn">Ver</button>
+                        <button class="btn btn-secondary action-btn">Descargar</button>
+                    </td>
+                </tr>
+            </

@@ -1,0 +1,81 @@
+<div id="editClientModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Editar Cliente</h3>
+            <span class="modal-close" onclick="closeModal('editClientModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="editClientForm" onsubmit="submitClientForm(event, 'editClientForm')">
+                <input type="hidden" id="editClientId" name="editClientId">
+                <div class="form-group">
+                    <label for="editClientName">Nombre completo *</label>
+                    <input type="text" id="editClientName" name="editClientName" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editClientEmail">Email *</label>
+                        <input type="email" id="editClientEmail" name="editClientEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editClientPhone">Teléfono *</label>
+                        <input type="tel" id="editClientPhone" name="editClientPhone" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editClientBirthdate">Fecha de nacimiento</label>
+                        <input type="date" id="editClientBirthdate" name="editClientBirthdate">
+                    </div>
+                    <div class="form-group">
+                        <label for="editClientGender">Género</label>
+                        <select id="editClientGender" name="editClientGender">
+                            <option value="">Seleccionar</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                            <option value="O">Otro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editClientAddress">Dirección</label>
+                    <input type="text" id="editClientAddress" name="editClientAddress">
+                </div>
+                <div class="form-group">
+                    <label for="editClientMembership">Membresía *</label>
+                    <select id="editClientMembership" name="editClientMembership" required>
+                        <option value="">Seleccionar membresía</option>
+                        <option value="1">Básico - $30/mes</option>
+                        <option value="2">Estándar - $80/3 meses</option>
+                        <option value="3">Premium - $300/año</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editClientStartDate">Fecha inicio *</label>
+                        <input type="date" id="editClientStartDate" name="editClientStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editClientEndDate">Fecha fin</label>
+                        <input type="date" id="editClientEndDate" name="editClientEndDate" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editClientStatus">Estado</label>
+                    <select id="editClientStatus" name="editClientStatus">
+                        <option value="active">Activo</option>
+                        <option value="inactive">Vencido</option>
+                        <option value="pending">Por vencer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editClientNotes">Notas adicionales</label>
+                    <textarea id="editClientNotes" name="editClientNotes" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('editClientModal')">Cancelar</button>
+            <button class="btn btn-primary" onclick="document.getElementById('editClientForm').requestSubmit()">Guardar cambios</button>
+        </div>
+    </div>
+</div>
