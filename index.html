@@ -863,7 +863,252 @@
 
 <!-- Modales -->
 <!-- Modal Agregar Cliente -->
+<!-- Modal Agregar Cliente -->
 <div id="addClientModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h3>Agregar Nuevo Cliente</h3>
+            <span class="modal-close" onclick="closeModal('addClientModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="addClientForm" onsubmit="submitClientForm(event, 'addClientForm')">
+                <div class="form-group">
+                    <label for="clientName">Nombre completo *</label>
+                    <input type="text" id="clientName" name="clientName" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientEmail">Email *</label>
+                        <input type="email" id="clientEmail" name="clientEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientPhone">Teléfono *</label>
+                        <input type="tel" id="clientPhone" name="clientPhone" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientBirthdate">Fecha de nacimiento</label>
+                        <input type="date" id="clientBirthdate" name="clientBirthdate">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientGender">Género</label>
+                        <select id="clientGender" name="clientGender">
+                            <option value="">Seleccionar</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                            <option value="O">Otro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="clientAddress">Dirección</label>
+                    <input type="text" id="clientAddress" name="clientAddress">
+                </div>
+                <div class="form-group">
+                    <label for="clientMembership">Membresía *</label>
+                    <select id="clientMembership" name="clientMembership" required>
+                        <option value="">Seleccionar membresía</option>
+                        <option value="1">Básico - $30/mes</option>
+                        <option value="2">Estándar - $80/3 meses</option>
+                        <option value="3">Premium - $300/año</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="clientStartDate">Fecha inicio *</label>
+                        <input type="date" id="clientStartDate" name="clientStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientEndDate">Fecha fin</label>
+                        <input type="date" id="clientEndDate" name="clientEndDate" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="clientNotes">Notas adicionales</label>
+                    <textarea id="clientNotes" name="clientNotes" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('addClientModal')">Cancelar</button>
+            <button class="btn btn-primary" onclick="document.getElementById('addClientForm').requestSubmit()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Cliente -->
+<div id="editClientModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Editar Cliente</h3>
+            <span class="modal-close" onclick="closeModal('editClientModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="editClientForm" onsubmit="submitClientForm(event, 'editClientForm')">
+                <input type="hidden" id="editClientId" name="editClientId">
+                <div class="form-group">
+                    <label for="editClientName">Nombre completo *</label>
+                    <input type="text" id="editClientName" name="editClientName" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editClientEmail">Email *</label>
+                        <input type="email" id="editClientEmail" name="editClientEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editClientPhone">Teléfono *</label>
+                        <input type="tel" id="editClientPhone" name="editClientPhone" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editClientBirthdate">Fecha de nacimiento</label>
+                        <input type="date" id="editClientBirthdate" name="editClientBirthdate">
+                    </div>
+                    <div class="form-group">
+                        <label for="editClientGender">Género</label>
+                        <select id="editClientGender" name="editClientGender">
+                            <option value="">Seleccionar</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                            <option value="O">Otro</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editClientAddress">Dirección</label>
+                    <input type="text" id="editClientAddress" name="editClientAddress">
+                </div>
+                <div class="form-group">
+                    <label for="editClientMembership">Membresía *</label>
+                    <select id="editClientMembership" name="editClientMembership" required>
+                        <option value="">Seleccionar membresía</option>
+                        <option value="1">Básico - $30/mes</option>
+                        <option value="2">Estándar - $80/3 meses</option>
+                        <option value="3">Premium - $300/año</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editClientStartDate">Fecha inicio *</label>
+                        <input type="date" id="editClientStartDate" name="editClientStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editClientEndDate">Fecha fin</label>
+                        <input type="date" id="editClientEndDate" name="editClientEndDate" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editClientStatus">Estado</label>
+                    <select id="editClientStatus" name="editClientStatus">
+                        <option value="active">Activo</option>
+                        <option value="inactive">Vencido</option>
+                        <option value="pending">Por vencer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editClientNotes">Notas adicionales</label>
+                    <textarea id="editClientNotes" name="editClientNotes" rows="3"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('editClientModal')">Cancelar</button>
+            <button class="btn btn-primary" onclick="document.getElementById('editClientForm').requestSubmit()">Guardar cambios</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Agregar Membresía -->
+<div id="addMembershipModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Agregar Nueva Membresía</h3>
+            <span class="modal-close" onclick="closeModal('addMembershipModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="addMembershipForm" onsubmit="submitMembershipForm(event, 'addMembershipForm')">
+                <div class="form-group">
+                    <label for="membershipName">Nombre *</label>
+                    <input type="text" id="membershipName" name="membershipName" required>
+                </div>
+                <div class="form-group">
+                    <label for="membershipDescription">Descripción *</label>
+                    <textarea id="membershipDescription" name="membershipDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="membershipDuration">Duración (meses) *</label>
+                        <input type="number" id="membershipDuration" name="membershipDuration" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="membershipPrice">Precio *</label>
+                        <input type="number" id="membershipPrice" name="membershipPrice" min="0" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Accesos incluidos</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="accessGym" name="access" value="gym" checked>
+                            <label for="accessGym">Acceso a equipos</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="accessClasses" name="access" value="classes">
+                            <label for="accessClasses">Clases grupales</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="accessPool" name="access" value="pool">
+                            <label for="accessPool">Piscina</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="accessSauna" name="access" value="sauna">
+                            <label for="accessSauna">Sauna</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="membershipTrainingSession">Sesiones con entrenador personal</label>
+                    <input type="number" id="membershipTrainingSession" name="membershipTrainingSession" min="0" value="0">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('addMembershipModal')">Cancelar</button>
+            <button class="btn btn-primary" onclick="document.getElementById('addMembershipForm').requestSubmit()">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Membresía -->
+<div id="editMembershipModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Editar Membresía</h3>
+            <span class="modal-close" onclick="closeModal('editMembershipModal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="editMembershipForm" onsubmit="submitMembershipForm(event, 'editMembershipForm')">
+                <input type="hidden" id="editMembershipId" name="editMembershipId">
+                <div class="form-group">
+                    <label for="editMembershipName">Nombre *</label>
+                    <input type="text" id="editMembershipName" name="editMembershipName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editMembershipDescription">Descripción *</label>
+                    <textarea id="editMembershipDescription" name="editMembershipDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editMembershipDuration">Duración (meses) *</label>
+                        <input type="number" id="editMembershipDuration" name="editMembershipDuration" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editMembershipPrice">Precio *</label>
+                        <input type="number" id="editMembershipPrice" name="editMembershipPrice" min="0" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Accesos incluidos</label>
+                    <div class="checkbox-group">
