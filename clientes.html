@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes - GymSystem</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>GymSystem</h2>
+            <p>Gestión de gimnasio</p>
+        </div>
+        <ul>
+            <li data-section="dashboard">
+                <span class="sidebar-icon">📊</span>
+                <a class="nav-link" href="index.html">Inicio</a>
+            </li>
+            <li class="active" data-section="clients">
+                <span class="sidebar-icon">👥</span>
+                <span>Clientes</span>
+            </li>
+            <li data-section="memberships">
+                <span class="sidebar-icon">🏆</span>
+                <span>Membresías</span>
+            </li>
+            <li data-section="attendance">
+                <span class="sidebar-icon">📋</span>
+                <span>Asistencia</span>
+            </li>
+            <li data-section="payments">
+                <span class="sidebar-icon">💰</span>
+                <span>Pagos</span>
+            </li>
+            <li data-section="trainers">
+                <span class="sidebar-icon">🏋️</span>
+                <span>Entrenadores</span>
+            </li>
+            <li data-section="reports">
+                <span class="sidebar-icon">📈</span>
+                <span>Reportes</span>
+            </li>
+            <li data-section="settings">
+                <span class="sidebar-icon">⚙️</span>
+                <span>Configuración</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1 id="page-title">Gestión de Clientes</h1>
+            <div class="user-profile">
+                <span>Administrador</span>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+
+        <!-- Contenedor de alertas -->
+        <div id="alert-container"></div>
+
+        <!-- Sección principal de clientes -->
+        <div class="card-container">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Clientes</h3>
+                    <div class="card-icon clients">👥</div>
+                </div>
+                <div class="card-value">245</div>
+                <div class="card-label">Total de clientes activos</div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Membresías</h3>
+                    <div class="card-icon plans">🏆</div>
+                </div>
+                <div class="card-value">35</div>
+                <div class="card-label">Membresías a vencer este mes</div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Nuevos Clientes</h3>
+                    <div class="card-icon income">💰</div>
+                </div>
+                <div class="card-value">12</div>
+                <div class="card-label">Nuevos clientes este mes</div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3>Inactivos</h3>
+                    <div class="card-icon attendance">📋</div>
+                </div>
+                <div class="card-value">28</div>
+                <div class="card-label">Clientes inactivos</div>
+            </div>
+        </div>
+
+        <!-- Buscador y filtros -->
+        <div class="form-container">
+            <div class="form-row">
+                <div class="form-group">
+                    <input type="text" id="clientSearch" placeholder="Buscar cliente por nombre, email o teléfono...">
+                </div>
+                <div class="form-group">
+                    <select id="membershipFilter">
+                        <option value="">Filtrar por membresía</option>
+                        <option value="basic">Básico</option>
+                        <option value="standard">Estándar</option>
+                        <option value="premium">Premium</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select id="statusFilter">
+                        <option value="">Filtrar por estado</option>
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                        <option value="pending">Por vencer</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de clientes -->
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Lista de Clientes</h3>
+                <button class="btn btn-primary" onclick="openModal('addClientModal')">Nuevo Cliente</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Membresía</th>
+                        <th>Fecha Fin</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Ana Martínez</td>
+                        <td>ana@example.com</td>
+                        <td>555-1234</td>
+                        <td>Premium</td>
+                        <td>01/01/2024</td>
+                        <td><span class="status active">Activo</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn" onclick="openModal('editClientModal')">Editar</button>
+                            <button class="btn btn-secondary action-btn" onclick="openModal('viewClientModal')">Ver</button>
+                            <button class="btn btn-danger action-btn" onclick="confirmDelete(1)">Eliminar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Carlos Rodríguez</td>
+                        <td>carlos@example.com</td>
+                        <td>555-5678</td>
+                        <td>Básico</td>
+                        <td>15/03/2023</td>
+                        <td><span class="status inactive">Vencido</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn" onclick="openModal('editClientModal')">Editar</button>
+                            <button class="btn btn-secondary action-btn" onclick="openModal('viewClientModal')">Ver</button>
+                            <button class="btn btn-danger action-btn" onclick="confirmDelete(2)">Eliminar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>María López</td>
+                        <td>maria@example.com</td>
+                        <td>555-9012</td>
+                        <td>Estándar</td>
+                        <td>10/06/2023</td>
+                        <td><span class="status active">Activo</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn" onclick="openModal('editClientModal')">Editar</button>
+                            <button class="btn btn-secondary action-btn" onclick="openModal('viewClientModal')">Ver</button>
+                            <button class="btn btn-danger action-btn" onclick="confirmDelete(3)">Eliminar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Juan Gómez</td>
+                        <td>juan@example.com</td>
+                        <td>555-3456</td>
+                        <td>Premium</td>
+                        <td>05/03/2024</td>
+                        <td><span class="status active">Activo</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn" onclick="openModal('editClientModal')">Editar</button>
+                            <button class="btn btn-secondary action-btn" onclick="openModal('viewClientModal')">Ver</button>
+                            <button class="btn btn-danger action-btn" onclick="confirmDelete(4)">Eliminar</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Laura Sánchez</td>
+                        <td>laura@example.com</td>
+                        <td>555-7890</td>
+                        <td>Básico</td>
+                        <td>20/03/2023</td>
+                        <td><span class="status pending">Por vencer</span></td>
+                        <td>
+                            <button class="btn btn-primary action-btn" onclick="openModal('editClientModal')">Editar</button>
+                            <button class="btn btn-secondary action-btn" onclick="openModal('viewClientModal')">Ver</button>
+                            <button class="btn btn-danger action-btn" onclick="confirmDelete(5)">Eliminar</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="btn btn-secondary">Anterior</button>
+                <span>Página 1 de 5</span>
+                <button class="btn btn-secondary">Siguiente</button>
+            </div>
+        </div>
+
+        <!-- Sección de clientes próximos a vencer -->
+        <div class="table-container">
+            <div class="table-header">
+                <h3>Clientes por vencer</h3>
+                <button class="btn btn-secondary" onclick="sendReminderToAll()">Enviar recordatorio a todos</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Membresía</th>
+                        <th>Fecha fin</th>
+                        <th>Días restantes</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>5</td>
+                        <td>Laura Sánchez</td>
+                        <td>Básico</td>
+                        <td>20/03/2023</td>
+                        <td>5</td>
+                        <td>
+                            <button class="btn btn-primary action-btn" onclick="openModal('renewMembershipModal')">Renovar</button>
+                            <button class="btn btn-secondary action-btn" onclick="sendReminderEmail(5)">Enviar recordatorio</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>Pedro Ramírez</td>
+                        <td>Estándar</td>
+                        <td>05/04/2023</td>
+                        <td>12</td>
+                        <td>
+                            <button class="btn btn-primary action-btn" onclick="openModal('renewMembershipModal')">Renovar</button>
+                            <button class="btn btn-secondary action-btn" onclick="sendReminderEmail(8)">Enviar recordatorio</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>Sofía Vargas</td>
+                        <td>Premium</td>
+                        <td>15/04/2023</td>
+                        <td>20</td>
+                        <td>
+                            <button class="btn btn-primary action-btn" onclick="openModal('renewMembershipModal')">Renovar</button>
+                            <button class="btn btn-secondary action-btn" onclick="sendReminderEmail(12)">Enviar recordatorio</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Estadísticas de clientes -->
+        <div class="chart-row">
+            <div class="chart-col">
+                <div class="chart-container">
+                    <h3>Distribución de membresías</h3>
+                    <canvas id="membershipDistributionChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-col">
+                <div class="chart-container">
+                    <h3>Nuevos clientes por mes</h3>
+                    <canvas id="newClientsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modales -->
+        <!-- Modal Agregar Cliente -->
+        <div id="addClientModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Agregar Nuevo Cliente</h3>
+                    <span class="modal-close" onclick="closeModal('addClientModal')">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="addClientForm" onsubmit="submitClientForm(event, 'addClientForm')">
+                        <div class="form-group">
+                            <label for="clientName">Nombre completo *</label>
+                            <input type="text" id="clientName" name="clientName" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientEmail">Email *</label>
+                                <input type="email" id="clientEmail" name="clientEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientPhone">Teléfono *</label>
+                                <input type="tel" id="clientPhone" name="clientPhone" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientBirthdate">Fecha de nacimiento</label>
+                                <input type="date" id="clientBirthdate" name="clientBirthdate">
+                            </div>
+                            <div class="form-group">
+                                <label for="clientGender">Género</label>
+                                <select id="clientGender" name="clientGender">
+                                    <option value="">Seleccionar</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Femenino</option>
+                                    <option value="O">Otro</option>
+                                </select>
+                            </div>
+                        </div>
