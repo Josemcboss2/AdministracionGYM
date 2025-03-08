@@ -140,3 +140,22 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+function loadSection(sectionId) {
+    console.log(`Cargando sección: ${sectionId}`);
+    fetch(`sections/${sectionId}.html`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error al cargar la sección: ${sectionId}`);
+            }
+            return response.text();
+        })
+        .then(html => {
+            console.log(`Sección cargada: ${sectionId}`);
+            document.getElementById('section-container').innerHTML = html;
+        })
+        .catch(error => {
+            console.error(error);
+            document.getElementById('section-container').innerHTML = `<p>Error al cargar la sección: ${sectionId}</p>`;
+        });
+}
