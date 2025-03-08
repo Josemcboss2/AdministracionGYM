@@ -1,59 +1,113 @@
-<div id="trainers" class="section-content">
-    <div class="table-container">
-        <div class="table-header">
-            <h3>Lista de Entrenadores</h3>
-            <button class="btn btn-primary" onclick="openModal('addTrainerModal')">Nuevo Entrenador</button>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Web de Gimnasio</title>
+    <link rel="stylesheet" href="trainerstyle.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="/apptrainers.js" ></script>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>Sistema Web de Gimnasio</h1>
+        <nav>
+            <ul>
+                <li><a href="#trainers">Entrenadores</a></li>
+                <li><a href="#clients">Clientes</a></li>
+                <li><a href="#memberships">Membresías</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Contenido principal -->
+    <main>
+        <div id="trainers" class="section-content">
+            <div class="table-container">
+                <div class="table-header">
+                    <h3>Lista de Entrenadores</h3>
+                    <button class="btn btn-primary" onclick="openModal('addTrainerModal')">Nuevo Entrenador</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Especialidad</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Horario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Roberto Méndez</td>
+                            <td>Musculación</td>
+                            <td>roberto@example.com</td>
+                            <td>555-2468</td>
+                            <td>Lun-Vie: 8am-2pm</td>
+                            <td>
+                                <button class="btn btn-primary action-btn" onclick="editTrainer(1)">Editar</button>
+                                <button class="btn btn-danger action-btn" onclick="deleteTrainer(1)">Eliminar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Patricia Vásquez</td>
+                            <td>Cardio</td>
+                            <td>patricia@example.com</td>
+                            <td>555-1357</td>
+                            <td>Lun-Vie: 3pm-9pm</td>
+                            <td>
+                                <button class="btn btn-primary action-btn" onclick="editTrainer(2)">Editar</button>
+                                <button class="btn btn-danger action-btn" onclick="deleteTrainer(2)">Eliminar</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Diego Alonso</td>
+                            <td>CrossFit</td>
+                            <td>diego@example.com</td>
+                            <td>555-3690</td>
+                            <td>Sáb-Dom: 10am-6pm</td>
+                            <td>
+                                <button class="btn btn-primary action-btn" onclick="editTrainer(3)">Editar</button>
+                                <button class="btn btn-danger action-btn" onclick="deleteTrainer(3)">Eliminar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Especialidad</th>
-                    <th>Email</th>
-                    <th>Teléfono</th>
-                    <th>Horario</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Roberto Méndez</td>
-                    <td>Musculación</td>
-                    <td>roberto@example.com</td>
-                    <td>555-2468</td>
-                    <td>Lun-Vie: 8am-2pm</td>
-                    <td>
-                        <button class="btn btn-primary action-btn" onclick="editTrainer(1)">Editar</button>
-                        <button class="btn btn-danger action-btn" onclick="deleteTrainer(1)">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Patricia Vásquez</td>
-                    <td>Cardio</td>
-                    <td>patricia@example.com</td>
-                    <td>555-1357</td>
-                    <td>Lun-Vie: 3pm-9pm</td>
-                    <td>
-                        <button class="btn btn-primary action-btn" onclick="editTrainer(2)">Editar</button>
-                        <button class="btn btn-danger action-btn" onclick="deleteTrainer(2)">Eliminar</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Diego Alonso</td>
-                    <td>CrossFit</td>
-                    <td>diego@example.com</td>
-                    <td>555-3690</td>
-                    <td>Sáb-Dom: 10am-6pm</td>
-                    <td>
-                        <button class="btn btn-primary action-btn" onclick="editTrainer(3)">Editar</button>
-                        <button class="btn btn-danger action-btn" onclick="deleteTrainer(3)">Eliminar</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2023 Sistema Web de Gimnasio. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Modal para agregar entrenador -->
+    <div id="addTrainerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addTrainerModal')">&times;</span>
+            <h2>Agregar Nuevo Entrenador</h2>
+            <form id="addTrainerForm">
+                <label for="trainerName">Nombre:</label>
+                <input type="text" id="trainerName" name="trainerName" required>
+                <label for="trainerSpecialty">Especialidad:</label>
+                <input type="text" id="trainerSpecialty" name="trainerSpecialty" required>
+                <label for="trainerEmail">Email:</label>
+                <input type="email" id="trainerEmail" name="trainerEmail" required>
+                <label for="trainerPhone">Teléfono:</label>
+                <input type="tel" id="trainerPhone" name="trainerPhone" required>
+                <label for="trainerSchedule">Horario:</label>
+                <input type="text" id="trainerSchedule" name="trainerSchedule" required>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </form>
+        </div>
     </div>
-</div>
+</body>
+</html>
