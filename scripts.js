@@ -537,6 +537,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Set up modal close buttons
+    document.querySelectorAll('.modal-close').forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                closeModal(modal.id);
+            }
+        });
+    });
+
     // Load the initial dashboard section
     loadSection('dashboard');
 });
