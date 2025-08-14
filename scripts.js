@@ -1,5 +1,130 @@
+/*
+================================================================================
+|                                                                              |
+|                      UNIFIED JAVASCRIPT LOGIC (scripts.js)                     |
+|                                                                              |
+================================================================================
+|                                                                              |
+| This file merges the logic from app.js, scripts.js, and apptrainers.js.      |
+| It follows a Single Page Application (SPA) model where sections are          |
+| dynamically loaded. Data is persisted using localStorage.                    |
+|                                                                              |
+|------------------------------------------------------------------------------|
+| SECTIONS:                                                                    |
+|   1. Core App & Navigation                                                   |
+|   2. Data Management (localStorage)                                          |
+|   3. UI & Modals                                                             |
+|   4. Chart Initialization                                                    |
+|   5. Entity-Specific Logic (Clients, Memberships, etc.)                      |
+|   6. Event Listeners                                                         |
+--------------------------------------------------------------------------------
+*/
+
+// =============================================================================
+// 1. CORE APP & NAVIGATION
+// =============================================================================
+
+const sections = {
+    'dashboard': 'sections/dashboard.html',
+    'clients': 'sections/clients.html',
+    'memberships': 'sections/memberships.html',
+    'attendance': 'sections/attendance.html',
+    'payments': 'sections/payments.html',
+    'trainers': 'sections/trainers.html',
+    'reports': 'sections/reports.html',
+    'settings': 'sections/settings.html'
+};
+
+/**
+ * Loads a section dynamically into the main content area.
+ * @param {string} sectionName - The name of the section to load.
+ */
+async function loadSection(sectionName) {
+    try {
+        const sectionContainer = document.getElementById('section-container');
+        if (!sectionContainer) throw new Error('Section container not found');
+
+        if (sections[sectionName]) {
+            const response = await fetch(sections[sectionName]);
+            if (!response.ok) throw new Error(`Failed to load section: ${response.statusText}`);
+
+            sectionContainer.innerHTML = await response.text();
+
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) {
+                pageTitle.textContent = sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
+            }
+
+            updateActiveSidebarItem(sectionName);
+            initSection(sectionName); // Initialize logic for the loaded section
+
+            console.log(`Section "${sectionName}" loaded successfully.`);
+        } else {
+            showAlert('error', `Section "${sectionName}" does not exist.`);
+        }
+    } catch (error) {
+        console.error('Error loading section:', error);
+        showAlert('error', 'Could not load the requested section.');
+    }
+}
+
+/**
+ * Initializes charts, tables, and event listeners for a given section.
+ * @param {string} sectionName - The name of the section to initialize.
+ */
+function initSection(sectionName) {
+    switch (sectionName) {
+        case 'dashboard':
+            initDashboardCharts();
+            updateDashboardCounts();
+            break;
+        case 'clients':
+            initClientCharts();
+            loadClientsTable();
+            initClientEventListeners();
+            break;
+        case 'memberships':
+            loadMembershipsTable();
+            initMembershipEventListeners();
+            break;
+        case 'trainers':
+            loadTrainersTable();
+            initTrainerEventListeners();
+            break;
+        case 'attendance':
+            loadAttendanceTable();
+            initAttendanceEventListeners();
+            break;
+        // Add cases for other sections as they are developed
+    }
+}
+
+
+/**
+ * Updates the 'active' class on the sidebar navigation items.
+ * @param {string} sectionName - The currently active section.
+ */
+function updateActiveSidebarItem(sectionName) {
+    const sidebarItems = document.querySelectorAll('.sidebar li');
+    sidebarItems.forEach(item => {
+        item.classList.remove('active');
+        if (item.getAttribute('data-section') === sectionName) {
+            item.classList.add('active');
+        }
+    });
+}
+
+
+// =============================================================================
+// 2. DATA MANAGEMENT (localStorage)
+// =============================================================================
+
+/**
+ * Retrieves all gym data from localStorage.
+ * @returns {object} The gym data object.
+ */
 function getGymData() {
-    return JSON.parse(localStorage.getItem("gymData")) || {
+    const defaultData = {
         clients: [],
         trainers: [],
         memberships: [],
@@ -7,356 +132,421 @@ function getGymData() {
         payments: [],
         counters: { clients: 0, trainers: 0, memberships: 0, attendance: 0, payments: 0 }
     };
-
+    try {
+        const data = JSON.parse(localStorage.getItem("gymData"));
+        return data || defaultData;
+    } catch (e) {
+        return defaultData;
+    }
 }
 
-
+/**
+ * Saves the gym data object to localStorage.
+ * @param {object} data - The gym data to save.
+ */
 function saveGymData(data) {
     localStorage.setItem("gymData", JSON.stringify(data));
 }
+
+/**
+ * Generates a new unique ID for a given entity type.
+ * @param {string} entity - The type of entity (e.g., 'clients', 'trainers').
+ * @returns {number} The new unique ID.
+ */
 function generateId(entity) {
     let data = getGymData();
-    if (!data.counters[entity]) {
-        data.counters[entity] = 1;
-    } else {
-        data.counters[entity]++;
-    }
+    data.counters[entity] = (data.counters[entity] || 0) + 1;
     saveGymData(data);
     return data.counters[entity];
 }
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', function() {
-        document.querySelectorAll('.page').forEach(page => page.style.display = 'none');
-        document.getElementById(this.getAttribute('data-page') + "-page").style.display = 'block';
-        document.getElementById('page-title').innerText = this.innerText;
-    });
-});
 
-document.addEventListener("DOMContentLoaded", function() {
-    loadClientsTable();
-    loadPaymentsTable();
-    loadAttendanceTable();
-    loadMembershipsTable();  // Asegúrate de llamar a esta función para cargar las membresías
-    loadMembershipsInSelect();  // Para cargar las opciones de membresía en los formularios
-});
+// =============================================================================
+// 3. UI & MODALS
+// =============================================================================
 
-document.getElementById("add-client-btn").addEventListener("click", function() {
-    openModal("client-modal");
-    loadMembershipsInSelect();
-});
+/**
+ * Displays an alert message at the top of the page.
+ * @param {string} type - The type of alert ('success', 'error', 'warning').
+ * @param {string} message - The message to display.
+ */
+function showAlert(type, message) {
+    const alertContainer = document.getElementById('alert-container');
+    if (!alertContainer) return;
 
-document.getElementById("client-form").addEventListener("submit", function(event) {
-    event.preventDefault();
-    let name = document.getElementById("client-name").value;
-    if (name.trim() === "") {
-        alert("El nombre no puede estar vacío");
-        return;
-    }
-    // Guardar cliente en localStorage
-});
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert ${type}`;
+    alertDiv.innerHTML = `
+        <span class="alert-message">${message}</span>
+        <span class="alert-close" onclick="this.parentElement.remove()">&times;</span>
+    `;
+    alertContainer.appendChild(alertDiv);
 
-document.querySelectorAll('.modal-close').forEach(button => {
-    button.addEventListener('click', function() {
-        this.closest('.modal').style.display = 'none';
-    });
-});
+    setTimeout(() => alertDiv.remove(), 5000);
+}
 
+/**
+ * Opens a modal dialog.
+ * @param {string} modalId - The ID of the modal to open.
+ */
 function openModal(modalId) {
-    document.getElementById(modalId).style.display = "block";
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+    }
 }
+
+/**
+ * Closes a modal dialog.
+ * @param {string} modalId - The ID of the modal to close.
+ */
 function closeModal(modalId) {
-    document.getElementById(modalId).style.display = "none";
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
-document.getElementById("client-form").addEventListener("submit", function(event) {
-    event.preventDefault(); // Evita que la página se recargue
-    
-    let data = getGymData(); // Obtiene los datos almacenados
 
-    // Crear un nuevo cliente
-    let client = {
-        id: generateId("clients"),
-        name: document.getElementById("client-name").value,
-        email: document.getElementById("client-email").value,
-        phone: document.getElementById("client-phone").value,
-        birthdate: document.getElementById("client-birthdate").value,
-        gender: document.getElementById("client-gender").value,
-        membership_id: parseInt(document.getElementById("client-membership").value),
-        start_date: document.getElementById("client-start-date").value
-    };
+// =============================================================================
+// 4. CHART INITIALIZATION
+// =============================================================================
 
-    data.clients.push(client); // Agregar cliente al array
-    saveGymData(data); // Guardar en `localStorage`
-
-    loadClientsTable(); // Actualizar la tabla de clientes
-    updateDashboardCounts(); // Actualizar el contador del Dashboard
-
-    closeModal("client-modal"); // Cerrar el modal
-    this.reset(); // Limpiar el formulario
-});
-
-function loadClientsTable() {
-    let data = getGymData();
-    let tableBody = document.getElementById("clients-table");
-    tableBody.innerHTML = "";
-
-    // Verifica si hay clientes
-    if (data.clients.length === 0) {
-        // Si no hay clientes, muestra un mensaje o deja la tabla vacía
-        tableBody.innerHTML = "<tr><td colspan='6'>No hay clientes disponibles.</td></tr>";
-    } else {
-        data.clients.forEach(client => {
-            let membership = getMembershipById(client.membership_id); // Obtener la membresía por ID
-            let row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${client.id}</td>
-                <td>${client.name}</td>
-                <td>${client.email}</td>
-                <td>${client.phone}</td>
-                <td>${membership ? membership.name : 'Sin Membresía'}</td>
-                <td>
-                    <button class="btn btn-danger" onclick="deleteClient(${client.id})">Eliminar</button>
-                </td>
-            `;
-            tableBody.appendChild(row);
+function initDashboardCharts() {
+    const incomeCtx = document.getElementById('incomeChart');
+    if (incomeCtx) {
+        // Dummy data for now
+        new Chart(incomeCtx, {
+            type: 'line',
+            data: {
+                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Ingresos ($)',
+                    data: [1250, 1800, 1600, 2100, 1900, 2400],
+                    borderColor: '#4CAF50',
+                    tension: 0.4,
+                    fill: true
+                }]
+            }
         });
     }
 
-    updateDashboardCounts(); // Refrescar los contadores
+    const attendanceCtx = document.getElementById('attendanceChart');
+    if (attendanceCtx) {
+        // Placeholder, as attendance data is not fully implemented
+        new Chart(attendanceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                datasets: [{
+                    label: 'Clientes por día',
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)'
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Asistencia (Datos de demostración)'
+                    }
+                }
+            }
+        });
+    }
 }
 
+function initClientCharts() {
+    const data = getGymData();
+    const membershipCtx = document.getElementById('membershipDistributionChart');
+    if (membershipCtx) {
+        const membershipCounts = data.memberships.map(m => ({
+            name: m.name,
+            count: data.clients.filter(c => c.membership_id === m.id).length
+        }));
 
+        new Chart(membershipCtx, {
+            type: 'pie',
+            data: {
+                labels: membershipCounts.map(m => m.name),
+                datasets: [{
+                    data: membershipCounts.map(m => m.count),
+                    backgroundColor: ['#ff9f40', '#36a2eb', '#9966ff', '#ff6384', '#4bc0c0']
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Distribución de membresías'
+                    }
+                }
+            }
+        });
+    }
+}
 
+// =============================================================================
+// 5. ENTITY-SPECIFIC LOGIC
+// =============================================================================
+
+// ---------- Dashboard ----------
 function updateDashboardCounts() {
-    let data = getGymData();
-    document.getElementById("active-clients-count").innerText = data.clients.length; // Actualizar el contador de clientes
-    document.getElementById("trainers-count").innerText = data.trainers.length; // Actualizar el contador de entrenadores (si aplica)
-    document.getElementById("memberships-count").innerText = data.memberships.length; // Actualizar el contador de membresías (si aplica)
-    document.getElementById("attendance-count").innerText = data.attendance.length; // Actualizar el contador de asistencia
-    document.getElementById("payments-count").innerText = data.payments.length; // Actualizar el contador de pagos (si aplica)
+    const data = getGymData();
+    const clientCountEl = document.getElementById("client-count");
+    if(clientCountEl) clientCountEl.innerText = data.clients.length;
 }
 
 
+// ---------- Clients ----------
+function loadClientsTable(clientsToRender) {
+    const data = getGymData();
+    const clients = clientsToRender || data.clients;
+    const tableBody = document.getElementById("clients-table-body");
+    if (!tableBody) return;
 
-function deleteClient(clientId) {
-    if (!confirm("¿Seguro que deseas eliminar este cliente?")) return;
-
-    let data = getGymData();
-    console.log("Clientes antes de eliminar:", data.clients);
-
-    data.clients = data.clients.filter(client => client.id !== clientId); // Eliminar el cliente
-    console.log("Clientes después de eliminar:", data.clients);
-
-    saveGymData(data); // Guardar los datos actualizados en localStorage
-
-    loadClientsTable(); // Actualizar la tabla
-    updateDashboardCounts(); // Actualizar los contadores del Dashboard
-}
-
-
-// Membresías
-document.getElementById("add-membership-btn").addEventListener("click", function() {
-    document.getElementById("membership-form").reset(); // Limpiar formulario
-    document.getElementById("membership-id").value = ""; // Resetear ID oculto
-    document.getElementById("membership-modal-title").innerText = "Agregar Membresía";
-    openModal("membership-modal");
-});
-
-document.getElementById("membership-form").addEventListener("submit", function(event) {
-    event.preventDefault(); // Evitar recarga de la página
-
-    let data = getGymData();  // Obtener los datos del gimnasio
-
-    let membership = {
-        id: generateId("memberships"),
-        name: document.getElementById("membership-name").value.trim(),
-        description: document.getElementById("membership-description").value.trim(),
-        duration: document.getElementById("membership-duration").value,
-        price: parseFloat(document.getElementById("membership-price").value)
-    };
-
-    // Validación de datos
-    if (membership.name === "" || isNaN(membership.price) || membership.price <= 0) {
-        alert("Por favor, complete los campos correctamente.");
+    tableBody.innerHTML = "";
+    if (clients.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='8'>No se encontraron clientes con los filtros aplicados.</td></tr>";
         return;
     }
 
-    data.memberships.push(membership);  // Agregar la nueva membresía
-    saveGymData(data);  // Guardar los datos actualizados en localStorage
-
-    loadMembershipsTable();  // Recargar la tabla de membresías
-    updateDashboardCounts();  // Actualizar los contadores del dashboard
-
-    closeModal("membership-modal");  // Cerrar el modal
-    this.reset();  // Limpiar el formulario
-});
-// Cargar la Tabla de Membresías
-function loadMembershipsTable() {
-    let data = getGymData();  // Obtener datos del gimnasio desde localStorage
-    let tableBody = document.getElementById("memberships-table");  // Obtener el cuerpo de la tabla
-
-    tableBody.innerHTML = "";  // Limpiar el contenido de la tabla
-
-    data.memberships.forEach(membership => {
-        let row = document.createElement("tr");
+    clients.forEach(client => {
+        const membership = getMembershipById(client.membership_id) || { name: 'N/A' };
+        const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${membership.id}</td>
+            <td>${client.id}</td>
+            <td>${client.name}</td>
+            <td>${client.email}</td>
+            <td>${client.phone}</td>
             <td>${membership.name}</td>
-            <td>${membership.description}</td>
-            <td>${membership.duration}</td>
-            <td>$${membership.price}</td>
+            <td>${client.start_date}</td>
+            <td><span class="status active">Activo</span></td>
             <td>
-                <button class="btn btn-danger" onclick="deleteMembership(${membership.id})">Eliminar</button>
+                <button class="btn btn-primary action-btn" onclick="editClient(${client.id})">Editar</button>
+                <button class="btn btn-danger action-btn" onclick="deleteClient(${client.id})">Eliminar</button>
             </td>
         `;
         tableBody.appendChild(row);
     });
-
-    updateDashboardCounts();  // Actualizar los contadores del dashboard
 }
 
+function filterClients() {
+    const data = getGymData();
+    const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
 
-// Cargar membresias en el select
-function loadMembershipsInSelect() {
-    let data = getGymData(); // Obtener los datos del gimnasio desde el localStorage
-    let membershipSelect = document.getElementById("client-membership"); // Obtener el select por su ID
-    
-    // Limpiar el select actual
-    membershipSelect.innerHTML = ""; 
+    const filteredClients = data.clients.filter(client => {
+        const nameMatch = client.name.toLowerCase().includes(searchTerm);
+        const emailMatch = client.email.toLowerCase().includes(searchTerm);
+        const phoneMatch = client.phone.includes(searchTerm);
+        return nameMatch || emailMatch || phoneMatch;
+    });
 
-    // Crear una opción por defecto
-    let defaultOption = document.createElement("option");
-    defaultOption.value = "";
-    defaultOption.textContent = "Seleccionar membresía";
-    membershipSelect.appendChild(defaultOption);
-
-    // Si hay membresías disponibles, agregar cada una al select
-    if (data.memberships.length > 0) {
-        data.memberships.forEach(membership => {
-            let option = document.createElement("option");
-            option.value = membership.id;
-            option.textContent = membership.name;
-            membershipSelect.appendChild(option);
-        });
-    } else {
-        // Si no hay membresías, agregar un mensaje que indique que no hay
-        let noDataOption = document.createElement("option");
-        noDataOption.disabled = true;
-        noDataOption.textContent = "No hay membresías disponibles";
-        membershipSelect.appendChild(noDataOption);
-    }
+    loadClientsTable(filteredClients);
 }
 
-
-// Obtener membresias por ID
-function getMembershipById(id) {
+function deleteClient(clientId) {
+    if (!confirm("¿Seguro que deseas eliminar este cliente?")) return;
     let data = getGymData();
-    return data.memberships.find(membership => membership.id === id);
+    data.clients = data.clients.filter(c => c.id !== clientId);
+    saveGymData(data);
+    loadClientsTable();
+    updateDashboardCounts();
+    showAlert('success', 'Cliente eliminado correctamente.');
 }
 
-// eliminar membresias
-function deleteMembership(membershipId) {
-    // Verificar si la membresía está asignada a algún cliente
-    let data = getGymData();
-    let clientUsingMembership = data.clients.some(client => client.membership_id === membershipId);
+function editClient(clientId) {
+    // Placeholder - will be implemented later
+    showAlert('info', `Funcionalidad para editar cliente #${clientId} no implementada.`);
+}
 
-    if (clientUsingMembership) {
-        alert("No se puede eliminar esta membresía porque está asignada a un cliente.");
+// ---------- Memberships ----------
+function loadMembershipsTable() {
+    const data = getGymData();
+    const tableBody = document.getElementById("memberships-table-body");
+    if (!tableBody) return;
+
+    tableBody.innerHTML = "";
+    if (data.memberships.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='5'>No hay membresías para mostrar.</td></tr>";
         return;
     }
 
-    if (!confirm("¿Seguro que deseas eliminar esta membresía?")) return;
-
-    data.memberships = data.memberships.filter(membership => membership.id !== membershipId);
-    saveGymData(data);
-
-    loadMembershipsTable(); // Actualizar la tabla
-    updateDashboardCounts(); // Actualizar Dashboard
-}
-
-
-//Asistencia
-document.getElementById("add-attendance-btn").addEventListener("click", function() {
-    openModal("attendance-modal");
-});
-
-function loadClientsInSelect() {
-    let data = getGymData(); // Obtener datos desde localStorage
-    let clientSelect = document.getElementById("attendance-client");
-
-    data.clients.forEach(client => {
-        let option = document.createElement("option");
-        option.value = client.id; // El ID del cliente
-        option.textContent = client.name; // Nombre del cliente
-        clientSelect.appendChild(option);
-    });
-}
-
-function loadTrainersInSelect() {
-    let data = getGymData(); // Obtener datos desde localStorage
-    let trainerSelect = document.getElementById("attendance-trainer");
-
-    data.trainers.forEach(trainer => {
-        let option = document.createElement("option");
-        option.value = trainer.id; // El ID del entrenador
-        option.textContent = trainer.name; // Nombre del entrenador
-        trainerSelect.appendChild(option);
-    });
-}
-
-document.getElementById("add-attendance-btn").addEventListener("click", function() {
-    openModal("attendance-modal");
-    loadClientsInSelect(); // Cargar clientes
-    loadTrainersInSelect(); // Cargar entrenadores
-});
-
-
-document.getElementById("attendance-form").addEventListener("submit", function(event) {
-    event.preventDefault(); // Evita que la página se recargue
-    
-    let data = getGymData(); // Obtener los datos almacenados en localStorage
-    
-    // Crear nueva entrada de asistencia
-    let attendance = {
-        id: generateId("attendance"),
-        client_id: parseInt(document.getElementById("attendance-client").value),
-        date: document.getElementById("attendance-date").value,
-        time: document.getElementById("attendance-time").value,
-        trainer_id: parseInt(document.getElementById("attendance-trainer").value),
-        status: document.getElementById("attendance-status").value
-    };
-    
-    data.attendance.push(attendance); // Agregar nueva asistencia al array
-    saveGymData(data); // Guardar en localStorage
-
-    loadAttendanceTable(); // Actualizar la tabla de asistencia
-    updateDashboardCounts(); // Actualizar el Dashboard
-
-    closeModal("attendance-modal"); // Cerrar el modal
-    this.reset(); // Limpiar el formulario
-});
-
-function loadAttendanceTable() {
-    let data = getGymData(); // Obtener los datos de asistencia desde localStorage
-    let tableBody = document.getElementById("attendance-table");
-    tableBody.innerHTML = ""; // Limpiar la tabla actual
-
-    // Recorrer las asistencias y agregarlas a la tabla
-    data.attendance.forEach(attendance => {
-        let client = data.clients.find(client => client.id === attendance.client_id);
-        let trainer = data.trainers.find(trainer => trainer.id === attendance.trainer_id);
-        
-        let row = document.createElement("tr");
+    data.memberships.forEach(m => {
+        const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${attendance.id}</td>
-            <td>${client ? client.name : 'Desconocido'}</td>
-            <td>${attendance.date}</td>
-            <td>${attendance.time}</td>
-            <td>${trainer ? trainer.name : 'Sin Entrenador'}</td>
-            <td>${attendance.status}</td>
+            <td>${m.id}</td>
+            <td>${m.name}</td>
+            <td>${m.description}</td>
+            <td>${m.duration} días</td>
+            <td>$${m.price}</td>
+            <td>
+                <button class="btn btn-danger action-btn" onclick="deleteMembership(${m.id})">Eliminar</button>
+            </td>
         `;
         tableBody.appendChild(row);
     });
-
-    updateDashboardCounts(); // Actualizar los contadores
 }
+
+function deleteMembership(membershipId) {
+    if (!confirm("¿Seguro que deseas eliminar esta membresía?")) return;
+    let data = getGymData();
+    const isAssigned = data.clients.some(c => c.membership_id === membershipId);
+    if (isAssigned) {
+        showAlert('error', 'No se puede eliminar una membresía asignada a un cliente.');
+        return;
+    }
+    data.memberships = data.memberships.filter(m => m.id !== membershipId);
+    saveGymData(data);
+    loadMembershipsTable();
+    showAlert('success', 'Membresía eliminada correctamente.');
+}
+
+function getMembershipById(id) {
+    return getGymData().memberships.find(m => m.id === id);
+}
+
+// ---------- Trainers ----------
+function loadTrainersTable() {
+     const data = getGymData();
+    const tableBody = document.getElementById("trainers-table-body");
+    if (!tableBody) return;
+
+    tableBody.innerHTML = "";
+    if (data.trainers.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='5'>No hay entrenadores para mostrar.</td></tr>";
+        return;
+    }
+    // Placeholder for trainer table rendering
+}
+
+function deleteTrainer(trainerId) {
+     if (!confirm("¿Seguro que deseas eliminar este entrenador?")) return;
+     // Placeholder
+     showAlert('success', `Entrenador #${trainerId} eliminado.`);
+}
+
+// ---------- Attendance ----------
+function loadAttendanceTable() {
+    const data = getGymData();
+    const tableBody = document.getElementById("attendance-table-body");
+    if (!tableBody) return;
+    tableBody.innerHTML = "";
+    if (data.attendance.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='6'>No hay registros de asistencia.</td></tr>";
+    }
+    // Placeholder for attendance table rendering
+}
+
+
+// =============================================================================
+// 6. EVENT LISTENERS
+// =============================================================================
+
+function initClientEventListeners() {
+    const addClientBtn = document.getElementById("add-client-btn");
+    if (addClientBtn) {
+        addClientBtn.addEventListener("click", () => openModal("addClientModal"));
+    }
+
+    const clientForm = document.getElementById("addClientForm");
+    if (clientForm) {
+        clientForm.addEventListener("submit", event => {
+            event.preventDefault();
+            const data = getGymData();
+            const newClient = {
+                id: generateId("clients"),
+                name: document.getElementById("clientName").value,
+                email: document.getElementById("clientEmail").value,
+                phone: document.getElementById("clientPhone").value,
+                membership_id: parseInt(document.getElementById("clientMembership").value),
+                start_date: new Date().toISOString().split('T')[0],
+            };
+            data.clients.push(newClient);
+            saveGymData(data);
+            loadClientsTable();
+            updateDashboardCounts();
+            closeModal("addClientModal");
+            showAlert('success', 'Cliente agregado correctamente.');
+            clientForm.reset();
+        });
+    }
+
+    const searchInput = document.getElementById('clientSearch');
+    if(searchInput) {
+        searchInput.addEventListener('keyup', filterClients);
+    }
+}
+
+function initMembershipEventListeners() {
+    const addMembershipBtn = document.getElementById("add-membership-btn");
+    if(addMembershipBtn) {
+        addMembershipBtn.addEventListener("click", () => openModal("addMembershipModal"));
+    }
+
+    const membershipForm = document.getElementById("addMembershipForm");
+    if(membershipForm) {
+        membershipForm.addEventListener("submit", event => {
+            event.preventDefault();
+            const data = getGymData();
+            const newMembership = {
+                id: generateId("memberships"),
+                name: document.getElementById("membershipName").value,
+                description: document.getElementById("membershipDescription").value,
+                duration: parseInt(document.getElementById("membershipDuration").value),
+                price: parseFloat(document.getElementById("membershipPrice").value)
+            };
+            data.memberships.push(newMembership);
+            saveGymData(data);
+            loadMembershipsTable();
+            closeModal("addMembershipModal");
+            showAlert('success', 'Membresía agregada correctamente.');
+            membershipForm.reset();
+        });
+    }
+}
+
+function initTrainerEventListeners() {
+     const addTrainerBtn = document.getElementById("add-trainer-btn");
+    if(addTrainerBtn) {
+        addTrainerBtn.addEventListener("click", () => openModal("addTrainerModal"));
+    }
+    // Add form submission logic
+}
+
+function initAttendanceEventListeners() {
+    const addAttendanceBtn = document.getElementById("add-attendance-btn");
+    if(addAttendanceBtn) {
+        addAttendanceBtn.addEventListener("click", () => openModal("addAttendanceModal"));
+    }
+    // Add form submission logic
+}
+
+
+/**
+ * Main initialization logic on DOM content loaded.
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up sidebar navigation
+    const sidebarItems = document.querySelectorAll('.sidebar li');
+    sidebarItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const sectionName = this.getAttribute('data-section');
+            if (sectionName) {
+                loadSection(sectionName);
+            }
+        });
+    });
+
+    // Set up modal close buttons
+    document.querySelectorAll('.modal-close').forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            if (modal) {
+                closeModal(modal.id);
+            }
+        });
+    });
+
+    // Load the initial dashboard section
+    loadSection('dashboard');
+});
